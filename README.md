@@ -32,4 +32,10 @@ let sipher = one_way_encode(158721);
 assert_eq!(sipher, "2361");
 ```
 
+You can also build and use the cli (doc included)
+
+```shell
+    cargo run --features cli
+``` 
+
 License: MIT
