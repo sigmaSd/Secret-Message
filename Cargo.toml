@@ -3,6 +3,10 @@ name = "secret-msg"
 version = "0.2.0"
 authors = ["Nbiba Bedis <bedisnbiba@gmail.com>"]
 edition = "2018"
+readme = "README.md"
+description = "Simple way to encrypt a message"
+repository = "https://github.com/sigmaSd/Secret-Message"
+license = "MIT"
 
 [dependencies]
 rand = "*"
