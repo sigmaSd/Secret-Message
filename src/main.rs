@@ -18,25 +18,9 @@ fn main() {
 
 fn enc() {
     let data = match args().nth(2) {
-        Some(data) => {
-            let mut buffer = String::new();
-            let mut file = File::open(data).unwrap();
-            file.read_to_string(&mut buffer).unwrap();
-            buffer
-        }
-        None if args().len() == 2 => {
-            let mut buffer = String::new();
-            let stdin = io::stdin();
-            let mut handle = stdin.lock();
-
-            handle.read_to_string(&mut buffer).unwrap();
-            buffer
-        }
-        None => {
-            let mut buffer = String::new();
-            io::stdin().read_line(&mut buffer).unwrap();
-            buffer
-        }
+        Some(data) => read_from_file(&data),
+        None if args().len() == 2 => read_from_stdin(),
+        None => read_interactively(),
     };
 
     let enc_data = encode(&data);
@@ -52,33 +36,45 @@ fn enc() {
 }
 
 fn dec() {
-    let key = args().nth(2).unwrap().parse::<usize>().unwrap();
+    let key = match args().nth(2).unwrap().parse::<usize>() {
+        Ok(k) => k,
+        Err(e) => panic!("Key argument incorrect: {}", e),
+    };
 
     let data = match args().nth(3) {
-        Some(data) => {
-            let mut buffer = String::new();
-            let mut file = File::open(data).unwrap();
-            file.read_to_string(&mut buffer).unwrap();
-            buffer
-        }
-        None if args().len() == 2 => {
-            let mut buffer = String::new();
-            let stdin = io::stdin();
-            let mut handle = stdin.lock();
-
-            handle.read_to_string(&mut buffer).unwrap();
-            buffer
-        }
-        None => {
-            let mut buffer = String::new();
-            io::stdin().read_line(&mut buffer).unwrap();
-            buffer
-        }
+        Some(data) => read_from_file(&data),
+        None if args().len() == 2 => read_from_stdin(),
+        None => read_interactively(),
     };
 
     data.lines().for_each(|l| {
         println!("{}", decode(l, key));
     });
+}
+
+fn read_from_file(data: &str) -> String {
+    let mut buffer = String::new();
+    match File::open(data) {
+        Ok(mut file) => {
+            file.read_to_string(&mut buffer).unwrap();
+            buffer
+        }
+        Err(_) => read_from_stdin(),
+    }
+}
+fn read_from_stdin() -> String {
+    let mut buffer = String::new();
+    let stdin = io::stdin();
+    let mut handle = stdin.lock();
+
+    handle.read_to_string(&mut buffer).unwrap();
+    buffer
+}
+
+fn read_interactively() -> String {
+    let mut buffer = String::new();
+    io::stdin().read_line(&mut buffer).unwrap();
+    buffer
 }
 
 fn print_usage() {
