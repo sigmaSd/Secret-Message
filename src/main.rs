@@ -22,13 +22,8 @@ fn enc() {
             buffer
         }
     };
-    //TODO: Find a fix for Time Crypto Unicode
-    let enc_data = loop {
-        let enc_data = encode(&data);
-        if enc_data.1 == 0 || enc_data.1 == 1 {
-            break enc_data;
-        }
-    };
+
+    let enc_data = encode(&data);
     enc_data.0.lines().for_each(|l| {
         println!("{}", l);
     });
