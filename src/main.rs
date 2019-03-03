@@ -1,3 +1,5 @@
+#![cfg(feature = "cli")]
+
 use secret_msg::{decode, encode};
 use std::env::args;
 use std::fs::File;
@@ -24,6 +26,7 @@ fn enc() {
     };
 
     let enc_data = encode(&data);
+
     let mut enc_file = {
         let f = args().last().unwrap();
         if Path::exists(Path::new(&f)) {
@@ -31,7 +34,9 @@ fn enc() {
         }
         File::create(f).unwrap()
     };
+
     write!(enc_file, "{}", enc_data.0).unwrap();
+
     println!("Key: {}", enc_data.1);
 }
 

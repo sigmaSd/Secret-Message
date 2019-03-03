@@ -11,3 +11,8 @@ license = "MIT"
 [dependencies]
 rand = "*"
 md5 = "*"
+
+[features]
+default = []
+cli = []
+
