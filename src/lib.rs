@@ -67,7 +67,7 @@ impl EncMethod {
     }
 }
 
-/// encrypt a msg with no easy way to get the original back from it
+/// encrypt a msg with no easy way to get the original back
 pub fn one_way_encode<T: ToString>(msg: T) -> String {
     let hash: [u8; 16] = md5::compute(msg.to_string()).into();
     hash.iter().fold(0, |acc, x| acc + *x as usize).to_string()
@@ -148,7 +148,9 @@ fn time_to_key() -> usize {
         }
     });
     // hmm
-    assert!(code != 0 && code != 1);
+    if code == 0 || code == 1 {
+        code = 2;
+    }
     code as usize
 }
 
