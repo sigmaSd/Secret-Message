@@ -24,10 +24,10 @@
 //! ```rust
 //! use secret_msg::SecretMessage;
 //!
-//! let sipher = "my_secret!".one_way_encrypt();
-//! assert_eq!(sipher, "1537");
-//! let sipher = 158721.one_way_encrypt();
-//! assert_eq!(sipher, "2361");
+//! let cipher = "my_secret!".one_way_encrypt();
+//! assert_eq!(cipher, "1537");
+//! let cipher = 158721.one_way_encrypt();
+//! assert_eq!(cipher, "2361");
 //! ```
 
 use rand::seq::SliceRandom;
@@ -68,13 +68,13 @@ impl EncMethod {
 }
 
 pub trait SecretMessage {
-    /// encrypt_character a msg with no easy way to get the original back
+    /// encrypt a msg with no easy way to get the original back
     fn one_way_encrypt(&self) -> String;
 
-    /// encrypt_character a msg -> returns an encrytped msg and a decrypt key
+    /// encrypt a msg -> returns an encrytped msg and a decrypt key
     fn encrypt(&self) -> (String, usize);
 
-    /// decrypt_character a msg using decrypt key
+    /// decrypt a msg using decrypt key
     fn decrypt(&self, key: usize) -> String;
 }
 
