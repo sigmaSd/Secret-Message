@@ -2,40 +2,34 @@
 
 ## Secret Message
 
-Simple way to encrypt a message (No security whatsoever!!!)
+Simple way to encrypt_character a message (No security whatsoever!!!)
 
-This crate exposes 3 functions:
+This crate exposes SecretMessage trait:
 
-Encrypt and decrypt a messge:
+encrypt_character and decrypt_character a messge:
 
-`encode` and `decode`:
+`encrypt` and `decrypt`:
 
 ```rust
-use secret_msg::{encode, decode};
+use secret_msg::SecretMessage;
 
-let (secret, key) = encode("my_secret!");
-assert_eq!(decode(&secret, key), "my_secret!");
-let (secret, key) = encode(1234);
-assert_eq!(decode(&secret, key), "1234");
+let (secret, key) = "my_secret!".encrypt();
+assert_eq!(secret.decrypt(key), "my_secret!");
+let (secret, key) = 1234.encrypt();
+assert_eq!(secret.decrypt(key), "1234");
 ```
 
-Encrypt a message with no easy way to retrieve it back
+encrypt_character a message with no easy way to retrieve it back
 
-`one_way_encode`:
+`one_way_encrypt`:
 
 ```rust
-use secret_msg::one_way_encode;
+use secret_msg::SecretMessage;
 
-let sipher = one_way_encode("my_secret!");
+let sipher = "my_secret!".one_way_encrypt();
 assert_eq!(sipher, "1537");
-let sipher = one_way_encode(158721);
+let sipher = 158721.one_way_encrypt();
 assert_eq!(sipher, "2361");
 ```
-
-You can also build and use the cli (doc included)
-
-```shell
-    cargo run --features cli
-``` 
 
 License: MIT
