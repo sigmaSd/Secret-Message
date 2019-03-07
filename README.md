@@ -4,7 +4,7 @@
 
 Simple way to encrypt a message (No security whatsoever!!!)
 
-This crate exposes SecretMessage trait:
+This crate exposes **SecretMessage** trait:
 
 encrypt and decrypt a messge:
 
