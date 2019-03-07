@@ -1,5 +1,3 @@
-#![cfg(feature = "cli")]
-
 use secret_msg::SecretMessage;
 use std::env::args;
 use std::fs::File;
