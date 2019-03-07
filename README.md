@@ -2,13 +2,13 @@
 
 ## Secret Message
 
-Simple way to encrypt_character a message (No security whatsoever!!!)
+Simple way to encrypt a message (No security whatsoever!!!)
 
 This crate exposes SecretMessage trait:
 
-encrypt_character and decrypt_character a messge:
+encrypt and decrypt a messge:
 
-`encrypt` and `decrypt`:
+**encrypt** and **decrypt**:
 
 ```rust
 use secret_msg::SecretMessage;
@@ -19,9 +19,9 @@ let (secret, key) = 1234.encrypt();
 assert_eq!(secret.decrypt(key), "1234");
 ```
 
-encrypt_character a message with no easy way to retrieve it back
+encrypt a message with no easy way to retrieve it back
 
-`one_way_encrypt`:
+**one_way_encrypt**:
 
 ```rust
 use secret_msg::SecretMessage;
