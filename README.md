@@ -37,4 +37,9 @@ Also a **cli** is included for fun (*Encrypt Decrypt files*):
   cargo run
 ```
 
+Also a **cli** is included for fun (*Encrypt Decrypt files*):
+```shell
+  cargo run 
+```
+
 License: MIT
