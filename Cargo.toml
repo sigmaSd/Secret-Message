@@ -9,11 +9,10 @@ repository = "https://github.com/sigmaSd/Secret-Message"
 license = "MIT"
 
 [dependencies]
-rand = "*"
-md5 = "*"
 chrono = "0.4.6"
+rand = "0.6.5"
+md5 = "0.6.1"
 
-[features]
-default = []
-cli = []
-
+[[bin]]
+name = "secret_msg"
+path = "src/main.rs"
