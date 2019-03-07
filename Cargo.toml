@@ -1,6 +1,6 @@
 [package]
 name = "secret-msg"
-version = "0.2.0"
+version = "0.3.0"
 authors = ["Nbiba Bedis <bedisnbiba@gmail.com>"]
 edition = "2018"
 readme = "README.md"
@@ -11,6 +11,7 @@ license = "MIT"
 [dependencies]
 rand = "*"
 md5 = "*"
+chrono = "0.4.6"
 
 [features]
 default = []

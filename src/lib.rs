@@ -1,32 +1,32 @@
 //! # Secret Message
 //!
-//! Simple way to encrypt a message (No security whatsoever!!!)
+//! Simple way to encrypt_character a message (No security whatsoever!!!)
 //!
-//! This crate exposes 3 functions:
+//! This crate exposes SecretMessage trait:
 //!
-//! Encrypt and decrypt a messge:
+//! encrypt_character and decrypt_character a messge:
 //!
-//! `encode` and `decode`:
+//! `encrypt` and `decrypt`:
 //!
 //! ```rust
-//! use secret_msg::{encode, decode};
+//! use secret_msg::SecretMessage;
 //!
-//! let (secret, key) = encode("my_secret!");
-//! assert_eq!(decode(&secret, key), "my_secret!");
-//! let (secret, key) = encode(1234);
-//! assert_eq!(decode(&secret, key), "1234");
+//! let (secret, key) = "my_secret!".encrypt();
+//! assert_eq!(secret.decrypt(key), "my_secret!");
+//! let (secret, key) = 1234.encrypt();
+//! assert_eq!(secret.decrypt(key), "1234");
 //! ```
 //!
-//! Encrypt a message with no easy way to retrieve it back
+//! encrypt_character a message with no easy way to retrieve it back
 //!
-//! `one_way_encode`:
+//! `one_way_encrypt`:
 //!
 //! ```rust
-//! use secret_msg::one_way_encode;
+//! use secret_msg::SecretMessage;
 //!
-//! let sipher = one_way_encode("my_secret!");
+//! let sipher = "my_secret!".one_way_encrypt();
 //! assert_eq!(sipher, "1537");
-//! let sipher = one_way_encode(158721);
+//! let sipher = 158721.one_way_encrypt();
 //! assert_eq!(sipher, "2361");
 //! ```
 
@@ -67,36 +67,46 @@ impl EncMethod {
     }
 }
 
-/// encrypt a msg with no easy way to get the original back
-pub fn one_way_encode<T: ToString>(msg: T) -> String {
-    let hash: [u8; 16] = md5::compute(msg.to_string()).into();
-    hash.iter().fold(0, |acc, x| acc + *x as usize).to_string()
+pub trait SecretMessage {
+    /// encrypt_character a msg with no easy way to get the original back
+    fn one_way_encrypt(&self) -> String;
+
+    /// encrypt_character a msg -> returns an encrytped msg and a decrypt key
+    fn encrypt(&self) -> (String, usize);
+
+    /// decrypt_character a msg using decrypt key
+    fn decrypt(&self, key: usize) -> String;
 }
 
-/// encrypt a msg -> returns an encrytped msg and a decode key
-pub fn encode<T: ToString>(msg: T) -> (String, usize) {
-    let method = EncMethod::choose();
-    let key = method.key();
+impl<T: ToString> SecretMessage for T {
+    fn one_way_encrypt(&self) -> String {
+        let hash: [u8; 16] = md5::compute(self.to_string()).into();
+        hash.iter().fold(0, |acc, x| acc + *x as usize).to_string()
+    }
 
-    let enc = msg
-        .to_string()
-        .chars()
-        .map(|c| encrypt(c, &method, key))
-        .collect::<String>();
+    fn encrypt(&self) -> (String, usize) {
+        let method = EncMethod::choose();
+        let key = method.key();
 
-    (enc, key)
+        let enc = self
+            .to_string()
+            .chars()
+            .map(|c| encrypt_character(c, &method, key))
+            .collect::<String>();
+
+        (enc, key)
+    }
+
+    fn decrypt(&self, key: usize) -> String {
+        let method = EncMethod::from_key(key);
+        self.to_string()
+            .chars()
+            .map(|c| decrypt_character(c, &method, key))
+            .collect::<String>()
+    }
 }
 
-/// decrypt a msg using decode key
-pub fn decode(enc_msg: &str, key: usize) -> String {
-    let method = EncMethod::from_key(key);
-    enc_msg
-        .chars()
-        .map(|c| decrypt(c, &method, key))
-        .collect::<String>()
-}
-
-fn encrypt(c: char, method: &EncMethod, key: usize) -> char {
+fn encrypt_character(c: char, method: &EncMethod, key: usize) -> char {
     match method {
         EncMethod::INC => char_move(c, 1),
         EncMethod::DEC => char_move(c, -1),
@@ -104,11 +114,11 @@ fn encrypt(c: char, method: &EncMethod, key: usize) -> char {
     }
 }
 
-fn decrypt(c: char, method: &EncMethod, key: usize) -> char {
+fn decrypt_character(c: char, method: &EncMethod, key: usize) -> char {
     match method {
         EncMethod::INC => char_move(c, -1),
         EncMethod::DEC => char_move(c, 1),
-        EncMethod::TIME => decrypt_time(c, key),
+        EncMethod::TIME => decrypt_character_time(c, key),
     }
 }
 
@@ -127,7 +137,7 @@ fn enc_time(c: char, key: usize) -> char {
     let enc_c = key + c as usize;
     (enc_c % 255) as u8 as char
 }
-fn decrypt_time(c: char, key: usize) -> char {
+fn decrypt_character_time(c: char, key: usize) -> char {
     // handle subtract with overflow
     let mut c = c as usize;
     let key = key % 255;
@@ -159,10 +169,10 @@ mod tests {
     use super::*;
     #[test]
     fn it_works() {
-        let (secret, key) = encode("my very secret msg ÿ0");
-        assert_eq!(decode(&secret, key), "my very secret msg ÿ0");
+        let (secret, key) = "my very secret msg ÿ0".encrypt();
+        assert_eq!(secret.decrypt(key), "my very secret msg ÿ0");
 
-        let (secret, key) = encode(56516510);
-        assert_eq!(decode(&secret, key), "56516510");
+        let (secret, key) = 56516510.encrypt();
+        assert_eq!(secret.decrypt(key), "56516510");
     }
 }

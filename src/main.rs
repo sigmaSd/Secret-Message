@@ -1,6 +1,6 @@
 #![cfg(feature = "cli")]
 
-use secret_msg::{decode, encode};
+use secret_msg::SecretMessage;
 use std::env::args;
 use std::fs::File;
 use std::io::{self, Read, Write};
@@ -25,7 +25,7 @@ fn enc() {
         None => read_interactively(),
     };
 
-    let enc_data = encode(&data);
+    let enc_data = data.encrypt();
 
     let mut enc_file = {
         let f = args().last().unwrap();
@@ -53,7 +53,7 @@ fn dec() {
     };
 
     data.lines().for_each(|l| {
-        println!("{}", decode(l, key));
+        println!("{}", l.decrypt(key));
     });
 }
 
