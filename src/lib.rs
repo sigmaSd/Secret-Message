@@ -149,10 +149,9 @@ fn decrypt_character_time(c: char, key: usize) -> char {
 
 // helper fns
 fn time_to_key() -> usize {
-    use std::process::Command;
-    let date = Command::new("date").output().unwrap().stdout;
+    use chrono::offset::Utc;
     let mut code = 0;
-    String::from_utf8_lossy(&date).chars().for_each(|c| {
+    &Utc::now().to_rfc2822().chars().for_each(|c| {
         if c.is_digit(10) {
             code += c.to_digit(10).unwrap();
         }
