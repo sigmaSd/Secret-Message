@@ -17,7 +17,14 @@
 //! assert_eq!(secret.decrypt(key), "1234");
 //! ```
 //!
-//! encrypt a message with no easy way to retrieve it back
+//! or use a custom key:
+//!
+//! ```rust
+//! use secret_msg::SecretMessage;
+//! let secret = "cool secret".encrypt_with_key(58794);
+//! assert_eq!(secret.decrypt(58794), "cool secret");
+//! ```
+//! encrypt a message with no easy way to retrieve it back:
 //!
 //! **one_way_encrypt**:
 //!
@@ -71,6 +78,9 @@ pub trait SecretMessage {
     /// encrypt a msg with no easy way to get the original back
     fn one_way_encrypt(&self) -> String;
 
+    /// encrypt a msg with a given key
+    fn encrypt_with_key(&self, key: usize) -> String;
+
     /// encrypt a msg -> returns an encrytped msg and a decrypt key
     fn encrypt(&self) -> (String, usize);
 
@@ -84,15 +94,20 @@ impl<T: ToString> SecretMessage for T {
         hash.iter().fold(0, |acc, x| acc + *x as usize).to_string()
     }
 
-    fn encrypt(&self) -> (String, usize) {
-        let method = EncMethod::choose();
-        let key = method.key();
+    fn encrypt_with_key(&self, key: usize) -> String {
+        let method = EncMethod::from_key(key);
 
-        let enc = self
-            .to_string()
+        self.to_string()
             .chars()
             .map(|c| encrypt_character(c, &method, key))
-            .collect::<String>();
+            .collect::<String>()
+    }
+
+    fn encrypt(&self) -> (String, usize) {
+        let method = EncMethod::choose();
+
+        let key = method.key();
+        let enc = self.encrypt_with_key(key);
 
         (enc, key)
     }
@@ -151,7 +166,7 @@ fn decrypt_character_time(c: char, key: usize) -> char {
 fn time_to_key() -> usize {
     use chrono::offset::Utc;
     let mut code = 0;
-    &Utc::now().to_rfc2822().chars().for_each(|c| {
+    Utc::now().to_rfc2822().chars().for_each(|c| {
         if c.is_digit(10) {
             code += c.to_digit(10).unwrap();
         }
@@ -173,5 +188,8 @@ mod tests {
 
         let (secret, key) = 56516510.encrypt();
         assert_eq!(secret.decrypt(key), "56516510");
+
+        let secret = "cool secret".encrypt_with_key(35413613);
+        assert_eq!(secret.decrypt(35413613), "cool secret");
     }
 }
