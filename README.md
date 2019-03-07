@@ -32,4 +32,9 @@ let sipher = 158721.one_way_encrypt();
 assert_eq!(sipher, "2361");
 ```
 
+Also a **cli** is included for fun (*Encrypt Decrypt files*):
+```shell
+  cargo run 
+```
+
 License: MIT
