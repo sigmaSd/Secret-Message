@@ -19,7 +19,14 @@ let (secret, key) = 1234.encrypt();
 assert_eq!(secret.decrypt(key), "1234");
 ```
 
-encrypt a message with no easy way to retrieve it back
+or use a custom key:
+
+```rust
+use secret_msg::SecretMessage;
+let secret = "cool secret".encrypt_with_key(58794);
+assert_eq!(secret.decrypt(58794), "cool secret");
+```
+encrypt a message with no easy way to retrieve it back:
 
 **one_way_encrypt**:
 
@@ -30,16 +37,6 @@ let cipher = "my_secret!".one_way_encrypt();
 assert_eq!(cipher, "1537");
 let cipher = 158721.one_way_encrypt();
 assert_eq!(cipher, "2361");
-```
-
-Also a **cli** is included for fun (*Encrypt Decrypt files*):
-```shell
-  cargo run
-```
-
-Also a **cli** is included for fun (*Encrypt Decrypt files*):
-```shell
-  cargo run 
 ```
 
 License: MIT
