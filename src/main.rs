@@ -16,6 +16,68 @@ fn main() {
     }
 }
 
+fn encb() {
+    let data = {
+        let mut data = vec![];
+        let d = args().nth(2).unwrap();
+        let mut d = File::open(d).unwrap();
+        d.read_to_end(&mut data).unwrap();
+        data
+    };
+    let enc: Vec<u8> = data
+        .iter()
+        .map(|v| {
+            let v = *v;
+            if v == 0 {
+                255
+            } else {
+                v - 1
+            }
+        })
+        .collect();
+
+    let mut enc_file = {
+        let f = args().last().unwrap();
+        if Path::exists(Path::new(&f)) {
+            panic!("cant write output file already exists");
+        }
+        File::create(f).unwrap()
+    };
+
+    enc_file.write_all(&enc).unwrap();
+}
+
+fn decb() {
+    let data = {
+        let mut data = vec![];
+        let d = args().nth(2).unwrap();
+        let mut d = File::open(d).unwrap();
+        d.read_to_end(&mut data).unwrap();
+        data
+    };
+    let dec: Vec<u8> = data
+        .iter()
+        .map(|v| {
+            let v = *v;
+            if v == 255 {
+                0
+            } else {
+                v + 1
+            }
+        })
+        .collect();
+
+    let mut dec_file = {
+        let f = args().last().unwrap();
+        if Path::exists(Path::new(&f)) {
+            panic!("cant write output file already exists");
+        }
+        File::create(f).unwrap()
+    };
+
+    dec_file.write_all(&dec).unwrap();
+}
+
 fn enc() {
     let data = match args().nth(2) {
         Some(data) => read_from_file(&data),
@@ -23,7 +85,12 @@ fn enc() {
         None => read_interactively(),
     };
 
-    let enc_data = data.encrypt();
+    if data.is_err() {
+        encb();
+        return;
+    }
+
+    let enc_data = data.unwrap().encrypt();
 
     let mut enc_file = {
         let f = args().last().unwrap();
@@ -41,7 +108,10 @@ fn enc() {
 fn dec() {
     let key = match args().nth(2).unwrap().parse::<usize>() {
         Ok(k) => k,
-        Err(e) => panic!("Key argument incorrect: {}", e),
+        Err(_) => {
+            decb();
+            return;
+        }
     };
 
     let data = match args().nth(3) {
@@ -50,34 +120,39 @@ fn dec() {
         None => read_interactively(),
     };
 
-    data.lines().for_each(|l| {
+    if data.is_err() {
+        decb();
+        return;
+    }
+
+    data.unwrap().lines().for_each(|l| {
         println!("{}", l.decrypt(key));
     });
 }
 
-fn read_from_file(data: &str) -> String {
+fn read_from_file(data: &str) -> Result<String, io::Error> {
     let mut buffer = String::new();
     match File::open(data) {
         Ok(mut file) => {
-            file.read_to_string(&mut buffer).unwrap();
-            buffer
+            file.read_to_string(&mut buffer)?;
+            Ok(buffer)
         }
         Err(_) => read_from_stdin(),
     }
 }
-fn read_from_stdin() -> String {
+fn read_from_stdin() -> Result<String, io::Error> {
     let mut buffer = String::new();
     let stdin = io::stdin();
     let mut handle = stdin.lock();
 
-    handle.read_to_string(&mut buffer).unwrap();
-    buffer
+    handle.read_to_string(&mut buffer)?;
+    Ok(buffer)
 }
 
-fn read_interactively() -> String {
+fn read_interactively() -> Result<String, io::Error> {
     let mut buffer = String::new();
-    io::stdin().read_line(&mut buffer).unwrap();
-    buffer
+    io::stdin().read_line(&mut buffer)?;
+    Ok(buffer)
 }
 
 fn print_usage() {
