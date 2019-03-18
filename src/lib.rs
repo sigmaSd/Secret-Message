@@ -164,9 +164,9 @@ fn decrypt_character_time(c: char, key: usize) -> char {
 
 // helper fns
 fn time_to_key() -> usize {
-    use chrono::offset::Utc;
+    use std::time::Instant;
     let mut code = 0;
-    Utc::now().to_rfc2822().chars().for_each(|c| {
+    Instant::now().elapsed().as_nanos().to_string().chars().for_each(|c| {
         if c.is_digit(10) {
             code += c.to_digit(10).unwrap();
         }
